@@ -1,0 +1,23 @@
+name: static-gh-pages
+
+on:
+  push:
+    branches:
+      - trunk
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: deploy
+        uses: peaceiris/actions-gh-pages@v3.9.3
+        if: ${{ github.ref == 'refs/heads/trunk' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .

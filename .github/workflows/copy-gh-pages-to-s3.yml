@@ -1,0 +1,22 @@
+name: copy-gh-pages-to-s3
+
+on:
+  workflow_run:
+    workflows: [static-gh-pages]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - run: >-
+          aws s3 sync . s3://${{ vars.AWS_S3_BUCKET }} --follow-symlinks --delete
